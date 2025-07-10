@@ -10,7 +10,7 @@ import logging
 import subprocess
 from pathlib import Path
 
-from constants import DEFAULT_COMMIT_MESSAGE, JSON_FILE, LOG_FILE, READ_COMMAND, WRITE_COMMAND
+from .constants import DEFAULT_COMMIT_MESSAGE, JSON_FILE, LOG_FILE, READ_COMMAND, WRITE_COMMAND
 
 
 class GitRepositoryManager:
@@ -116,8 +116,13 @@ class GitRepositoryManager:
     def _execute_git_command(self, command: list[str], repo_path: Path) -> bool:
         """Execute a git command in the specified repository."""
         try:
-            subprocess.run(command, cwd=repo_path, check=True, capture_output=True)
+            subprocess.run(command, cwd=repo_path, check=True, capture_output=True, text=True)
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.error(f"Git command {' '.join(command)} failed in {repo_path}: {e}")
+            error_msg = f"Git command {' '.join(command)} failed in {repo_path}: {e}"
+            if e.stdout:
+                error_msg += f"\nSTDOUT: {e.stdout.strip()}"
+            if e.stderr:
+                error_msg += f"\nSTDERR: {e.stderr.strip()}"
+            self.logger.error(error_msg)
             return False
