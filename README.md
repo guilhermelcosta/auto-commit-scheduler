@@ -1,6 +1,6 @@
 # Auto-Commit Scheduler
 
-A Python-based tool that automatically commits and pushes changes to multiple Git repositories. This tool is designed to run on system startup and manage your Git repositories automatically with robust network handling and SSH authentication.
+A Python-based tool that automatically commits and pushes changes to multiple Git repositories. This tool is designed to run on a schedule and manage your Git repositories automatically with robust network handling and SSH authentication.
 
 ## Overview
 
@@ -16,7 +16,7 @@ The Auto-Commit Scheduler monitors multiple Git repositories and automatically c
 - **Automatic Git Operations**: Automatically adds, commits, and pushes changes
 - **Multi-Repository Support**: Manages multiple repositories from a single configuration
 - **Comprehensive Logging**: Detailed logging of all operations with timestamps
-- **Startup Integration**: Runs automatically on system boot via cron
+- **Flexible Scheduling**: Runs on a schedule via cron (e.g., every 3 hours by default).
 - **Network-Aware**: Waits for network connectivity before attempting operations
 - **SSH Authentication**: Automatically handles SSH agent and key management
 - **Error Handling**: Robust error handling and reporting
@@ -52,7 +52,7 @@ auto-commit-scheduler/
 4. **Detection**: The system checks each repository for uncommitted changes
 5. **Auto-commit**: If changes are found, they are automatically staged, committed, and pushed
 6. **Logging**: All operations are logged to both `files/git_manager.log` and `files/cron.log`
-7. **Scheduling**: Runs automatically on system startup via cron
+7. **Scheduling**: Runs automatically on a schedule via cron.
 
 ## Installation and Setup
 
@@ -94,12 +94,12 @@ The `setup.sh` script automatically:
 
 - Creates the `files/` directory if it doesn't exist
 - Makes the `run_git_manager.sh` script executable
-- Adds a cron job that runs the auto-commit script on system startup with a 60-second delay
-- Uses the `@reboot` cron directive with network wait functionality
+- Adds a cron job that runs the auto-commit script every 3 hours.
+- Uses the `0 */3 * * *` cron expression.
 - Checks if the cron entry already exists to avoid duplicates
 - Provides feedback when the cron job is successfully added
 
-**Cron entry added**: `@reboot sleep 60 && /full/path/to/run_git_manager.sh`
+**Cron entry added**: `0 */3 * * * /full/path/to/run_git_manager.sh`
 
 ## Configuration
 
@@ -147,7 +147,7 @@ python3 -m src
 
 ### Automatic Execution
 
-After running `setup.sh`, the script will automatically execute on system startup. You can also manually manage the cron job:
+After running `setup.sh`, the script will automatically execute every 3 hours. You can also manually manage the cron job:
 
 ```bash
 # View current cron jobs
@@ -279,6 +279,19 @@ You can extend the functionality by modifying:
 - `run_git_manager.sh`: Modify network checks, SSH handling, or logging
 - `setup.sh`: Change cron scheduling or installation behavior
 
+### Cron Scheduling
+
+By default, the `setup.sh` script configures the cron job to run every 3 hours (`0 */3 * * *`). You can customize this schedule by editing the `CRON_ENTRY` variable in the `setup.sh` script before running it.
+
+Here are some common cron schedule examples:
+
+- **Every hour**: `0 * * * *`
+- **Every 6 hours**: `0 */6 * * *`
+- **Once a day at midnight**: `0 0 * * *`
+- **On system reboot**: `@reboot`
+
+To apply a new schedule, modify the `setup.sh` script and run it again. The script will add the new cron job without creating duplicates.
+
 ## Security Considerations
 
 - Ensure your Git repositories use SSH keys or secure authentication
@@ -299,7 +312,3 @@ Contributions are welcome! Please:
 - Include unit tests for new features
 - Update documentation when adding new functionality
 - Follow the existing code style and patterns
-
-## License
-
-[Add your license information here]
